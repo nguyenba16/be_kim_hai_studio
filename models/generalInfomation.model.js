@@ -7,8 +7,11 @@ const GeneralInfomationSchema = new Schema({
     url: String,
     public_id: String,
   },
+  vi_address: { type: String },
+  vi_address_other: { type: String },
+  en_address: { type: String },
+  en_address_other: { type: String },
   vi_team_name: { type: String },
-
   vi_personal_name: { type: String },
   vi_description: { type: String },
   vi_skill: { type: String },

@@ -16,8 +16,6 @@ export const createVideo = async (req, res) => {
       isShow = true,
       isLivestream = false,
     } = req.body;
-
-    // Validate các trường bắt buộc tương tự Album
     if (!vi_title || !en_title || !youtube_link) {
       return res.status(400).json({
         success: false,
@@ -29,7 +27,6 @@ export const createVideo = async (req, res) => {
     const coverFile = req.files?.cover_image?.[0];
 
     if (coverFile) {
-      // Upload lên thư mục riêng cho video để dễ quản lý
       const result = await uploadToCloudinary(
         coverFile.buffer,
         "videos/video-cover",
@@ -219,11 +216,13 @@ export const getListVideoAll = async (req, res) => {
     });
   }
 };
+
 export const getDetailVideo = async (req, res) => {
   try {
     const { videoId } = req.params;
+    const { lang } = req.query;
 
-    const video = await Video.findById(videoId).populate("vi_name en_name");
+    const video = await Video.findById(videoId);
 
     if (!video) {
       return res.status(404).json({
@@ -232,9 +231,25 @@ export const getDetailVideo = async (req, res) => {
       });
     }
 
+    let data;
+    if (lang === "vi" || lang === "en") {
+      data = {
+        _id: video._id,
+        title: lang === "en" ? video.en_title : video.vi_title,
+        desc: lang === "en" ? video.en_desc : video.vi_desc,
+        youtube_link: video.youtube_link,
+        category: video.category,
+        isShow: video.isShow,
+        isLivestream: video.isLivestream,
+        cover_image: video.cover_image,
+      };
+    } else {
+      data = video;
+    }
+
     return res.status(200).json({
       success: true,
-      data: video,
+      data,
     });
   } catch (error) {
     console.error("getDetailVideo error:", error);

@@ -42,6 +42,9 @@ export const getGeneralInformation = async (req, res) => {
         hero_title: lang === "vi" ? info.vi_hero_title : info.en_hero_title,
         hero_sub: lang === "vi" ? info.vi_hero_sub : info.en_hero_sub,
         personal_image: info.personal_image,
+        vi_address: lang === "vi" ? info.vi_address : info.en_address,
+        vi_address_other:
+          lang === "vi" ? info.vi_address_other : info.en_address_other,
       };
     } else {
       data = {
@@ -73,6 +76,10 @@ export const getGeneralInformation = async (req, res) => {
         en_hero_sub: info.en_hero_sub,
         vi_hero_sub: info.vi_hero_sub,
         personal_image: info.personal_image,
+        vi_address_other: info.vi_address_other,
+        vi_address: info.vi_address,
+        en_address: info.en_address,
+        en_address_other: info.en_address_other,
       };
     }
 
@@ -234,6 +241,10 @@ export const updateGeneralInformation = async (req, res) => {
       "en_hero_title",
       "en_hero_sub",
       "vi_hero_sub",
+      "vi_address",
+      "vi_address_other",
+      "en_address",
+      "en_address_other",
     ];
     const updateData = {};
 

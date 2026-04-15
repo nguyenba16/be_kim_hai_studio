@@ -17,7 +17,7 @@ export const createImages = async (req, res) => {
       isOutstanding = false,
     } = req.body || {};
 
-    const imageFiles = req.files?.images; // đặt tên input là 'images'
+    const imageFiles = req.files?.images;
 
     if (!imageFiles || imageFiles.length === 0) {
       return res.status(400).json({
