@@ -15,6 +15,8 @@ import serviceRouterCustomer from "./routes/customer/service.router.js";
 import serviceRouterAdmin from "./routes/admin/service.router.js";
 import feedbackRouterAdmin from "./routes/admin/feedback.router.js";
 import feedbackRouterCustomer from "./routes/customer/feedback.router.js";
+import pageSectionRouterAdmin from "./routes/admin/pageSection.router.js";
+import pageSectionRouterCustomer from "./routes/customer/pageSection.router.js";
 
 import connectDB from "./config/db.js";
 const app = express();
@@ -57,6 +59,8 @@ app.use("/admin/image", imageRouterAdmin);
 app.use("/admin/video", videoRouterAdmin);
 app.use("/admin/service", serviceRouterAdmin);
 app.use("/admin/feedback", feedbackRouterAdmin);
+app.use("/admin/page-section", pageSectionRouterAdmin);
+app.use("/customer/page-section", pageSectionRouterCustomer);
 
 // app.post("/customer/upload", upload.single("file"), async (req, res) => {
 //   try {
