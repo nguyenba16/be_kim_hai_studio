@@ -11,6 +11,11 @@ import imageRouterCustomer from "./routes/customer/image.router.js";
 import albumRouterCustomer from "./routes/customer/album.router.js";
 import imageRouterAdmin from "./routes/admin/image.router.js";
 import generalInfomationRouterAdmin from "./routes/admin/generalInfomation.router.js";
+import serviceRouterCustomer from "./routes/customer/service.router.js";
+import serviceRouterAdmin from "./routes/admin/service.router.js";
+import feedbackRouterAdmin from "./routes/admin/feedback.router.js";
+import feedbackRouterCustomer from "./routes/customer/feedback.router.js";
+
 import connectDB from "./config/db.js";
 const app = express();
 app.use(async (req, res, next) => {
@@ -41,6 +46,8 @@ app.use("/customer/auth", authRouterCustomer);
 app.use("/customer/album", albumRouterCustomer);
 app.use("/customer/image", imageRouterCustomer);
 app.use("/customer/video", videoRouterCustomer);
+app.use("/customer/service", serviceRouterCustomer);
+app.use("/customer/feedback", feedbackRouterCustomer);
 
 // Admin API Here
 app.use("/admin/auth", authRouter);
@@ -48,6 +55,8 @@ app.use("/admin/general-information", generalInfomationRouterAdmin);
 app.use("/admin/album", albumRouterAdmin);
 app.use("/admin/image", imageRouterAdmin);
 app.use("/admin/video", videoRouterAdmin);
+app.use("/admin/service", serviceRouterAdmin);
+app.use("/admin/feedback", feedbackRouterAdmin);
 
 // app.post("/customer/upload", upload.single("file"), async (req, res) => {
 //   try {

@@ -9,6 +9,7 @@ import {
   deleteVideo,
   updateIsShowVideo,
   updateVideo,
+  updateIsOutstandingVideo,
 } from "../../controllers/video.controller.js";
 dotenv.config();
 const router = express.Router();
@@ -33,5 +34,11 @@ router.post(
   protect,
   checkRole("admin"),
   updateIsShowVideo,
+);
+router.post(
+  "/update-outstanding/:videoId",
+  protect,
+  checkRole("admin"),
+  updateIsOutstandingVideo,
 );
 export default router;

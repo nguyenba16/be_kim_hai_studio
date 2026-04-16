@@ -48,6 +48,74 @@ const GeneralInfomationSchema = new Schema({
       public_id: String,
     },
   ],
+
+  // Stats section
+  stats: [
+    {
+      value: { type: String },
+      vi_label: { type: String },
+      en_label: { type: String },
+      vi_desc: { type: String },
+      en_desc: { type: String },
+    },
+  ],
+
+  // CTA Banner section
+  vi_cta_badge: { type: String },
+  en_cta_badge: { type: String },
+  vi_cta_title: { type: String },
+  en_cta_title: { type: String },
+  vi_cta_desc: { type: String },
+  en_cta_desc: { type: String },
+
+  // Why Choose Us section header
+  vi_why_title: { type: String },
+  en_why_title: { type: String },
+  vi_why_subtitle: { type: String },
+  en_why_subtitle: { type: String },
+
+  // Why Choose Us items
+  why_choose_items: [
+    {
+      icon_name: { type: String },
+      vi_title: { type: String },
+      en_title: { type: String },
+      vi_desc: { type: String },
+      en_desc: { type: String },
+    },
+  ],
+
+  // Collage images for Why Choose Us section
+  collage_images: [
+    {
+      url: { type: String },
+      public_id: { type: String },
+    },
+  ],
+
+  // About page fields
+  about_hero_image: {
+    url: { type: String },
+    public_id: { type: String },
+  },
+  vi_about_since: { type: String },
+  vi_about_subtitle: { type: String },
+  vi_about_desc: { type: String },
+  vi_about_philosophy_badge: { type: String },
+  vi_about_philosophy_title: { type: String },
+  vi_about_philosophy_italic: { type: String },
+  vi_about_philosophy_desc: { type: String },
+  about_moments: [
+    {
+      title: { type: String },
+      desc: { type: String },
+      img: {
+        url: { type: String },
+        public_id: { type: String },
+      },
+    },
+  ],
+
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });

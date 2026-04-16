@@ -27,7 +27,12 @@ router.patch(
   checkRole("admin"),
   upload.fields([
     { name: "logo_image", maxCount: 1 },
-    { name: "personal_image", maxCount: 3 },
+    { name: "personal_image", maxCount: 10 },
+    { name: "collage_images", maxCount: 20 },
+    { name: "about_hero_image", maxCount: 1 },
+    { name: "about_moment_image_0", maxCount: 1 },
+    { name: "about_moment_image_1", maxCount: 1 },
+    { name: "about_moment_image_2", maxCount: 1 },
   ]),
   updateGeneralInformation,
 );

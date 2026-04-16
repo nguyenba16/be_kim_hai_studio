@@ -18,6 +18,7 @@ const VideoModel = new Schema({
   link: { type: String, required: true },
   youtube_link: { type: String, required: true },
   isShow: { type: Boolean, required: true },
+  isOutstanding: { type: Boolean, required: true },
   isLivestream: { type: Boolean, default: false },
   cover_image: {
     url: String,

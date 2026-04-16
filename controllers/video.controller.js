@@ -14,9 +14,10 @@ export const createVideo = async (req, res) => {
       youtube_link,
       category,
       isShow = true,
+      isOutstanding = false,
       isLivestream = false,
     } = req.body;
-    if (!vi_title || !en_title || !youtube_link) {
+    if (!vi_title || !youtube_link) {
       return res.status(400).json({
         success: false,
         message: "Titles and YouTube link are required",
@@ -47,6 +48,7 @@ export const createVideo = async (req, res) => {
       category,
       isShow: isShow === "true" || isShow === true,
       isLivestream: isLivestream === "true" || isLivestream === true,
+      isOutstanding: isOutstanding === "true" || isOutstanding === true,
       cover_image,
     });
 
@@ -74,6 +76,7 @@ export const updateVideo = async (req, res) => {
       category,
       isShow,
       isLivestream,
+      isOutstanding,
     } = req.body;
 
     const video = await Video.findById(videoId);
@@ -91,7 +94,8 @@ export const updateVideo = async (req, res) => {
     if (link !== undefined) video.link = link;
     if (youtube_link !== undefined) video.youtube_link = youtube_link;
     if (category !== undefined) video.category = category;
-
+    if (isOutstanding !== undefined)
+      video.isOutstanding = isOutstanding === "true" || isOutstanding === true;
     // Cập nhật các trường boolean (ép kiểu từ string của form-data)
     if (isShow !== undefined)
       video.isShow = isShow === "true" || isShow === true;
@@ -136,6 +140,7 @@ export const getListVideo = async (req, res) => {
       category,
       isShow,
       isLivestream,
+      isOutstanding,
       page = 1,
       limit = 12,
       lang,
@@ -149,6 +154,9 @@ export const getListVideo = async (req, res) => {
 
     if (isLivestream !== undefined)
       filter.isLivestream = isLivestream === "true";
+
+    if (isOutstanding !== undefined)
+      filter.isOutstanding = isOutstanding === "true";
 
     const pageNumber = Math.max(Number(page), 1);
     const limitNumber = Math.max(Number(limit), 1);
@@ -191,15 +199,16 @@ export const getListVideo = async (req, res) => {
 
 export const getListVideoAll = async (req, res) => {
   try {
-    const { category, isShow, isLivestream } = req.query;
+    const { category, isShow, isLivestream, isOutstanding } = req.query;
 
     const filter = {};
 
     if (category) filter.category = category;
     if (isShow !== undefined) filter.isShow = isShow === "true";
-
     if (isLivestream !== undefined)
       filter.isLivestream = isLivestream === "true";
+    if (isOutstanding !== undefined)
+      filter.isOutstanding = isOutstanding === "true";
 
     const videos = await Video.find(filter).sort({ createdAt: -1 });
 
@@ -323,6 +332,37 @@ export const updateIsShowVideo = async (req, res) => {
     });
   } catch (error) {
     console.error("updateIsShowVideo error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
+};
+
+export const updateIsOutstandingVideo = async (req, res) => {
+  try {
+    const { videoId } = req.params;
+    const { isOutstanding } = req.body;
+
+    const video = await Video.findByIdAndUpdate(
+      videoId,
+      { isOutstanding },
+      { new: true },
+    );
+
+    if (!video) {
+      return res.status(404).json({
+        success: false,
+        message: "Video not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: video,
+    });
+  } catch (error) {
+    console.error("updateIsOutstandingVideo error:", error);
     return res.status(500).json({
       success: false,
       message: "Server error",
