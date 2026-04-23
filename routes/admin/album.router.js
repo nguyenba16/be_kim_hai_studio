@@ -19,7 +19,7 @@ router.post(
   checkRole("admin"),
   upload.fields([
     { name: "cover_image", maxCount: 1 },
-    { name: "images", maxCount: 30 },
+    { name: "images", maxCount: 50 },
   ]),
   createAlbum,
 );

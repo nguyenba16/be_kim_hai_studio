@@ -1,8 +1,5 @@
 import PageSection from "../models/pageSection.model.js";
-import {
-  uploadToCloudinary,
-  deleteFromCloudinary,
-} from "../config/cloudinary.js";
+import { deleteFromCloudinary } from "../config/cloudinary.js";
 
 // ========== CUSTOMER ==========
 
@@ -108,7 +105,7 @@ export const upsertPageSection = async (req, res) => {
       return res.status(400).json({ success: false, message: "section_key and page are required" });
     }
 
-    const bannerFile = req.files?.banner_image?.[0];
+    const bannerImageData = req.body?.banner_image;
 
     const existing = await PageSection.findOne({ section_key });
 
@@ -125,12 +122,12 @@ export const upsertPageSection = async (req, res) => {
       updatedAt: new Date(),
     };
 
-    if (bannerFile) {
+    // Accept pre-uploaded banner {url, public_id}
+    if (bannerImageData?.url && bannerImageData?.public_id) {
       if (existing?.images?.length > 0 && existing.images[0].public_id) {
         await deleteFromCloudinary(existing.images[0].public_id);
       }
-      const result = await uploadToCloudinary(bannerFile.buffer, "page_sections/banners");
-      updateData.images = [{ url: result.secure_url, public_id: result.public_id }];
+      updateData.images = [{ url: bannerImageData.url, public_id: bannerImageData.public_id }];
     }
 
     let section;

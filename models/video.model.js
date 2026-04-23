@@ -24,7 +24,7 @@ const VideoModel = new Schema({
     url: String,
     public_id: String,
   },
-  category: { type: String, enum: VIDEO_CATEGORY, required: true },
+  category: { type: String, enum: VIDEO_CATEGORY },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });

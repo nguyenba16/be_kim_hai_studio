@@ -1,8 +1,5 @@
 import GeneralInfomation from "../models/generalInfomation.model.js";
-import {
-  uploadToCloudinary,
-  deleteFromCloudinary,
-} from "../config/cloudinary.js";
+import { deleteFromCloudinary } from "../config/cloudinary.js";
 export const getGeneralInformation = async (req, res) => {
   try {
     const { lang } = req.query;
@@ -175,33 +172,14 @@ export const createGeneralInformation = async (req, res) => {
       en_about_title,
     } = req.body || {};
 
-    const logoImageFile = req.files?.logo_image?.[0];
-    const personalImageFiles = req.files?.personal_image || [];
+    const logoImageData = req.body?.logo_image;
+    const personalImagesData = req.body?.personal_image;
 
-    let logoImage = null;
+    const logoImage = logoImageData?.url && logoImageData?.public_id
+      ? { url: logoImageData.url, public_id: logoImageData.public_id }
+      : null;
 
-    if (logoImageFile) {
-      const result = await uploadToCloudinary(
-        logoImageFile.buffer,
-        "general_information/logo",
-      );
-
-      logoImage = {
-        url: result.secure_url,
-        public_id: result.public_id,
-      };
-    }
-    const personalImages = [];
-    for (const file of personalImageFiles) {
-      const result = await uploadToCloudinary(
-        file.buffer,
-        "general_information/personal",
-      );
-      personalImages.push({
-        url: result.secure_url,
-        public_id: result.public_id,
-      });
-    }
+    const personalImages = Array.isArray(personalImagesData) ? personalImagesData : [];
 
     const info = await GeneralInfomation.create({
       vi_team_name,
@@ -319,54 +297,25 @@ export const updateGeneralInformation = async (req, res) => {
       }
     });
 
-    // Handle JSON array fields
-    if (req.body?.stats !== undefined) {
-      try {
-        updateData.stats = JSON.parse(req.body.stats);
-      } catch (e) {
-        updateData.stats = req.body.stats;
-      }
-    }
-    if (req.body?.why_choose_items !== undefined) {
-      try {
-        updateData.why_choose_items = JSON.parse(req.body.why_choose_items);
-      } catch (e) {
-        updateData.why_choose_items = req.body.why_choose_items;
-      }
-    }
+    // JSON array fields (body is already parsed JSON, no JSON.parse needed)
+    if (req.body?.stats !== undefined) updateData.stats = req.body.stats;
+    if (req.body?.why_choose_items !== undefined) updateData.why_choose_items = req.body.why_choose_items;
+
+    // about_moments: images already embedded as {url, public_id}; delete replaced ones
     if (req.body?.about_moments !== undefined) {
-      try {
-        updateData.about_moments = JSON.parse(req.body.about_moments);
-      } catch (e) {
-        updateData.about_moments = req.body.about_moments;
-      }
-    }
-    // Handle per-moment image uploads (fields: about_moment_image_0, _1, _2)
-    const momentImages = updateData.about_moments
-      ? [...updateData.about_moments]
-      : currentInfo.about_moments
-        ? currentInfo.about_moments.map((m) => ({ ...m.toObject?.() ?? m }))
-        : [];
-    for (let i = 0; i < 3; i++) {
-      const file = req.files?.[`about_moment_image_${i}`]?.[0];
-      if (file) {
-        // Delete old image if exists
-        const oldPublicId = momentImages[i]?.img?.public_id;
-        if (oldPublicId) {
-          await deleteFromCloudinary(oldPublicId);
+      const newMoments = req.body.about_moments;
+      const oldMoments = currentInfo.about_moments || [];
+      for (let i = 0; i < newMoments.length; i++) {
+        const newImg = newMoments[i]?.img;
+        const oldImg = oldMoments[i]?.img;
+        if (newImg?.public_id && oldImg?.public_id && newImg.public_id !== oldImg.public_id) {
+          await deleteFromCloudinary(oldImg.public_id);
         }
-        const result = await uploadToCloudinary(
-          file.buffer,
-          "general_information/moments",
-        );
-        if (!momentImages[i]) momentImages[i] = {};
-        momentImages[i].img = { url: result.secure_url, public_id: result.public_id };
       }
-    }
-    if (updateData.about_moments || req.files?.about_moment_image_0 || req.files?.about_moment_image_1 || req.files?.about_moment_image_2) {
-      updateData.about_moments = momentImages;
+      updateData.about_moments = newMoments;
     }
 
+    // Delete removed personal images
     const deletedImages = req.body?.deleted_personal_images || [];
     if (deletedImages.length > 0) {
       for (const public_id of deletedImages) {
@@ -375,42 +324,26 @@ export const updateGeneralInformation = async (req, res) => {
       const remainImages = (currentInfo.personal_image || []).filter(
         (img) => !deletedImages.includes(img.public_id),
       );
-
       updateData.personal_image = remainImages;
     }
-    const logoImageFile = req.files?.logo_image?.[0];
-    const personalImageFiles = req.files?.personal_image || [];
-    if (logoImageFile) {
+
+    // logo_image: accept pre-uploaded {url, public_id}
+    const logoImageData = req.body?.logo_image;
+    if (logoImageData?.url && logoImageData?.public_id) {
       if (currentInfo.logo_image?.public_id) {
         await deleteFromCloudinary(currentInfo.logo_image.public_id);
       }
-
-      const result = await uploadToCloudinary(
-        logoImageFile.buffer,
-        "general_information/logo",
-      );
-
-      updateData.logo_image = {
-        url: result.secure_url,
-        public_id: result.public_id,
-      };
-    }
-    if (personalImageFiles.length > 0) {
-      const personalImages = currentInfo.personal_image || [];
-      for (const file of personalImageFiles) {
-        const result = await uploadToCloudinary(
-          file.buffer,
-          "general_information/personal",
-        );
-        personalImages.push({
-          url: result.secure_url,
-          public_id: result.public_id,
-        });
-      }
-      updateData.personal_image = personalImages;
+      updateData.logo_image = { url: logoImageData.url, public_id: logoImageData.public_id };
     }
 
-    // Handle collage images
+    // personal_image: new pre-uploaded images to append
+    const newPersonalImages = req.body?.personal_image;
+    if (Array.isArray(newPersonalImages) && newPersonalImages.length > 0) {
+      const existing = updateData.personal_image ?? (currentInfo.personal_image || []);
+      updateData.personal_image = [...existing, ...newPersonalImages];
+    }
+
+    // Delete removed collage images
     const deletedCollageImages = req.body?.deleted_collage_images || [];
     if (deletedCollageImages.length > 0) {
       for (const public_id of deletedCollageImages) {
@@ -421,33 +354,21 @@ export const updateGeneralInformation = async (req, res) => {
       );
       updateData.collage_images = remainCollage;
     }
-    const collageImageFiles = req.files?.collage_images || [];
-    if (collageImageFiles.length > 0) {
-      const collageImages = updateData.collage_images || (currentInfo.collage_images || []);
-      for (const file of collageImageFiles) {
-        const result = await uploadToCloudinary(
-          file.buffer,
-          "general_information/collage",
-        );
-        collageImages.push({
-          url: result.secure_url,
-          public_id: result.public_id,
-        });
-      }
-      updateData.collage_images = collageImages;
+
+    // collage_images: new pre-uploaded images to append
+    const newCollageImages = req.body?.collage_images;
+    if (Array.isArray(newCollageImages) && newCollageImages.length > 0) {
+      const existing = updateData.collage_images ?? (currentInfo.collage_images || []);
+      updateData.collage_images = [...existing, ...newCollageImages];
     }
 
-    // Handle about hero image
-    const aboutHeroImageFile = req.files?.about_hero_image?.[0];
-    if (aboutHeroImageFile) {
+    // about_hero_image: accept pre-uploaded {url, public_id}
+    const aboutHeroImageData = req.body?.about_hero_image;
+    if (aboutHeroImageData?.url && aboutHeroImageData?.public_id) {
       if (currentInfo.about_hero_image?.public_id) {
         await deleteFromCloudinary(currentInfo.about_hero_image.public_id);
       }
-      const result = await uploadToCloudinary(
-        aboutHeroImageFile.buffer,
-        "general_information/about_hero",
-      );
-      updateData.about_hero_image = { url: result.secure_url, public_id: result.public_id };
+      updateData.about_hero_image = { url: aboutHeroImageData.url, public_id: aboutHeroImageData.public_id };
     }
 
     updateData.updatedAt = new Date();
