@@ -1,14 +1,14 @@
 import mongoose from "mongoose";
 
 const { Schema } = mongoose;
-const CATEGORY = [
-  "pre_wedding", // Ảnh trước đám cưới (Album/Cổng)
-  "engagement", // Lễ ăn hỏi / Đính hôn
-  "destination", // Chụp ngoại cảnh xa / Du lịch
-  "anniversary", // Kỷ niệm ngày cưới
-  "portrait_couple", // Ảnh chân dung cặp đôi (Lifestyle)
-  "other", // Các dịch vụ khác (Event/Beauty...)
-  "wedding",
+export const CATEGORY = [
+  "all",
+  "wedding_ceremony",
+  "engagement",
+  "traditional_ceremony",
+  "reception",
+  "film",
+  "other",
 ];
 const AlbumModel = new Schema({
   vi_title: { type: String, required: true },
