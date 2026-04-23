@@ -272,7 +272,7 @@ export const updateAlbum = async (req, res) => {
     if (vi_desc !== undefined) album.vi_desc = vi_desc;
     if (en_title !== undefined) album.en_title = en_title;
     if (en_desc !== undefined) album.en_desc = en_desc;
-
+    if (category !== undefined) album.category = category;
     if (isShow !== undefined)
       album.isShow = isShow === "true" || isShow === true;
 

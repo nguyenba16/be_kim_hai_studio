@@ -2,7 +2,6 @@ import mongoose from "mongoose";
 
 const { Schema } = mongoose;
 export const CATEGORY = [
-  "all",
   "wedding_ceremony",
   "engagement",
   "traditional_ceremony",
