@@ -18,10 +18,13 @@ export const getMe = async (req, res) => {
     const user = await User.findById(payload.id).select("-password -__v");
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
 
     return res.status(200).json({
+      success: true,
       message: "Get user successfully",
       user,
     });
@@ -29,10 +32,10 @@ export const getMe = async (req, res) => {
     console.log("err in getMe", err);
 
     if (err.name === "TokenExpiredError") {
-      return res.status(401).json({ message: "Token expired" });
+      return res.status(401).json({ success: false, message: "Token expired" });
     }
 
-    return res.status(403).json({ message: "Invalid token" });
+    return res.status(403).json({ success: false, message: "Invalid token" });
   }
 };
 
@@ -44,7 +47,9 @@ export const signupAccount = async (req, res) => {
     // Check if admin already exists
     const existingAdmin = await User.findOne({ email });
     if (existingAdmin) {
-      return res.status(400).json({ message: "Admin already exists" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Admin already exists" });
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -75,6 +80,7 @@ export const signupAccount = async (req, res) => {
     });
 
     res.status(201).json({
+      success: true,
       message: "Admin created successfully",
       accessToken,
       admin: {
@@ -86,7 +92,9 @@ export const signupAccount = async (req, res) => {
     });
   } catch (error) {
     console.error("Error in signup:", error);
-    res.status(500).json({ message: error.message || "Server error" });
+    res
+      .status(500)
+      .json({ success: false, message: error.message || "Server error" });
   }
 };
 
@@ -129,6 +137,7 @@ export const signin = async (req, res) => {
     });
 
     res.status(200).json({
+      success: true,
       message: "Signin successful",
       accessToken,
       user: {
@@ -140,7 +149,9 @@ export const signin = async (req, res) => {
     });
   } catch (error) {
     console.error("Error in signin:", error);
-    res.status(500).json({ message: error.message || "Server error" });
+    res
+      .status(500)
+      .json({ success: false, message: error.message || "Server error" });
   }
 };
 
@@ -187,6 +198,8 @@ export const logout = async (req, res) => {
     });
   } catch (error) {
     console.log("err in logout", error);
-    return res.status(500).json({ message: error.message || "Server error" });
+    return res
+      .status(500)
+      .json({ success: false, message: error.message || "Server error" });
   }
 };
