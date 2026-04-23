@@ -11,12 +11,12 @@ export const CATEGORY = [
 ];
 const AlbumModel = new Schema({
   vi_title: { type: String, required: true },
-  vi_desc: { type: String, required: true },
-  en_title: { type: String, required: true },
-  en_desc: { type: String, required: true },
-  isOutstanding: { type: Boolean, required: true },
+  vi_desc: { type: String, default: "" },
+  en_title: { type: String, default: "" },
+  en_desc: { type: String, default: "" },
+  isOutstanding: { type: Boolean, default: false },
   isShow: { type: Boolean, required: true },
-  category: { type: String, enum: CATEGORY, required: true },
+  category: { type: String, enum: CATEGORY, default: "other" },
   cover_image: {
     url: String,
     public_id: String,

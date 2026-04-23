@@ -16,7 +16,7 @@ export const createAlbum = async (req, res) => {
       category,
     } = req.body;
 
-    if (!vi_title || !en_title) {
+    if (!vi_title) {
       return res.status(400).json({
         success: false,
         message: "Title is required",

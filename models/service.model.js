@@ -15,7 +15,6 @@ const ServiceSchema = new Schema(
     },
     desc: {
       type: String,
-      required: true,
     },
     slug: {
       type: String,
