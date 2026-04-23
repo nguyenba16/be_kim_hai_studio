@@ -7,8 +7,8 @@ export const getUploadSignature = (req, res) => {
     const timestamp = Math.round(Date.now() / 1000);
     const paramsToSign = `folder=${folder}&timestamp=${timestamp}`;
     const signature = crypto
-      .createHmac("sha1", process.env.CLOUDINARY_API_SECRET)
-      .update(paramsToSign)
+      .createHash("sha1")
+      .update(paramsToSign + process.env.CLOUDINARY_API_SECRET)
       .digest("hex");
     return res.json({
       signature,

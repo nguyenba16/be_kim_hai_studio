@@ -23,6 +23,8 @@ const PageSectionSchema = new Schema({
   vi_description: { type: String },
   en_description: { type: String },
   images: [ImageSchema],
+  video_url: { type: String },
+  video_public_id: { type: String },
   actions: [ActionButtonSchema],
   order: { type: Number, default: 0 },
   page: { type: String, required: true },

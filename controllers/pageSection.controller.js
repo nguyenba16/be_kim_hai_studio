@@ -27,6 +27,8 @@ export const getPageSectionByKey = async (req, res) => {
         subtitle: lang === "vi" ? section.vi_subtitle : section.en_subtitle,
         description: lang === "vi" ? section.vi_description : section.en_description,
         images: section.images,
+        video_url: section.video_url,
+        video_public_id: section.video_public_id,
         actions: section.actions,
         order: section.order,
       };
@@ -128,6 +130,16 @@ export const upsertPageSection = async (req, res) => {
         await deleteFromCloudinary(existing.images[0].public_id);
       }
       updateData.images = [{ url: bannerImageData.url, public_id: bannerImageData.public_id }];
+    }
+
+    // Accept pre-uploaded video {url, public_id}
+    const videoImageData = req.body?.video_image;
+    if (videoImageData?.url && videoImageData?.public_id) {
+      if (existing?.video_public_id) {
+        await deleteFromCloudinary(existing.video_public_id, "video");
+      }
+      updateData.video_url = videoImageData.url;
+      updateData.video_public_id = videoImageData.public_id;
     }
 
     let section;

@@ -27,11 +27,11 @@ export const uploadToCloudinary = async (
       .end(fileBuffer);
   });
 };
-export const deleteFromCloudinary = async (publicId) => {
+export const deleteFromCloudinary = async (publicId, resourceType = "image") => {
   if (!publicId) return null;
 
   try {
-    const result = await cloudinary.uploader.destroy(publicId);
+    const result = await cloudinary.uploader.destroy(publicId, { resource_type: resourceType });
     return result; // { result: 'ok' | 'not found' }
   } catch (error) {
     console.error("Delete cloudinary error:", error);
