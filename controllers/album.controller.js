@@ -253,7 +253,6 @@ export const updateAlbum = async (req, res) => {
       en_desc,
       isShow,
       isOutstanding,
-
       category,
       keepImageIds,
     } = req.body;
