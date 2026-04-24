@@ -31,12 +31,11 @@ export const createAlbum = async (req, res) => {
         coverFile.buffer,
         "images/album-cover",
       );
-
-      cover_image = {
-        url: result.secure_url,
-        public_id: result.public_id,
-      };
+      cover_image = { url: result.secure_url, public_id: result.public_id };
+    } else if (req.body.cover_image?.url) {
+      cover_image = req.body.cover_image;
     }
+
     const album = await Album.create({
       vi_title,
       vi_desc,
@@ -49,15 +48,12 @@ export const createAlbum = async (req, res) => {
     });
 
     const files = req.files?.images || [];
+    const imageUrls = Array.isArray(req.body.images) ? req.body.images : [];
 
     if (files.length > 0) {
       await Promise.all(
         files.map(async (file) => {
-          const result = await uploadToCloudinary(
-            file.buffer,
-            "images/gallery",
-          );
-
+          const result = await uploadToCloudinary(file.buffer, "images/gallery");
           await Image.create({
             albumId: album._id,
             url: result.secure_url,
@@ -68,6 +64,20 @@ export const createAlbum = async (req, res) => {
             isOutstanding: false,
           });
         }),
+      );
+    } else if (imageUrls.length > 0) {
+      await Promise.all(
+        imageUrls.map(async (imgData) =>
+          Image.create({
+            albumId: album._id,
+            url: imgData.url,
+            public_id: imgData.public_id,
+            about: "album",
+            category: category || "other",
+            isShow: true,
+            isOutstanding: false,
+          }),
+        ),
       );
     }
 
@@ -285,27 +295,23 @@ export const updateAlbum = async (req, res) => {
       if (album.cover_image?.public_id) {
         await deleteFromCloudinary(album.cover_image.public_id);
       }
-      const result = await uploadToCloudinary(
-        coverFile.buffer,
-        "images/album-cover",
-      );
-
-      album.cover_image = {
-        url: result.secure_url,
-        public_id: result.public_id,
-      };
+      const result = await uploadToCloudinary(coverFile.buffer, "images/album-cover");
+      album.cover_image = { url: result.secure_url, public_id: result.public_id };
+    } else if (req.body.cover_image?.url) {
+      if (album.cover_image?.public_id) {
+        await deleteFromCloudinary(album.cover_image.public_id);
+      }
+      album.cover_image = req.body.cover_image;
     }
     await album.save();
 
     // 1. xử lý keep + delete trước
     let keepIds = [];
-
     if (keepImageIds) {
-      keepIds = JSON.parse(keepImageIds);
+      keepIds = Array.isArray(keepImageIds) ? keepImageIds : JSON.parse(keepImageIds);
     }
 
     const oldImages = await Image.find({ albumId: album._id });
-
     const imagesToDelete = oldImages.filter(
       (img) => !keepIds.includes(img._id.toString()),
     );
@@ -315,22 +321,18 @@ export const updateAlbum = async (req, res) => {
         await deleteFromCloudinary(img.public_id);
       }),
     );
-
     await Image.deleteMany({
       _id: { $in: imagesToDelete.map((img) => img._id) },
     });
 
-    // 2. upload ảnh mới sau
+    // 2. thêm ảnh mới
     const files = req.files?.images || [];
+    const imageUrls = Array.isArray(req.body.images) ? req.body.images : [];
 
     if (files.length > 0) {
       await Promise.all(
         files.map(async (file) => {
-          const result = await uploadToCloudinary(
-            file.buffer,
-            "images/gallery",
-          );
-
+          const result = await uploadToCloudinary(file.buffer, "images/gallery");
           await Image.create({
             albumId: album._id,
             url: result.secure_url,
@@ -341,6 +343,20 @@ export const updateAlbum = async (req, res) => {
             isOutstanding: false,
           });
         }),
+      );
+    } else if (imageUrls.length > 0) {
+      await Promise.all(
+        imageUrls.map(async (imgData) =>
+          Image.create({
+            albumId: album._id,
+            url: imgData.url,
+            public_id: imgData.public_id,
+            about: "album",
+            category: category || "other",
+            isShow: true,
+            isOutstanding: false,
+          }),
+        ),
       );
     }
 
