@@ -51,7 +51,8 @@ export const getGeneralInformation = async (req, res) => {
         cta_title: lang === "vi" ? info.vi_cta_title : info.en_cta_title,
         cta_desc: lang === "vi" ? info.vi_cta_desc : info.en_cta_desc,
         why_title: lang === "vi" ? info.vi_why_title : info.en_why_title,
-        why_subtitle: lang === "vi" ? info.vi_why_subtitle : info.en_why_subtitle,
+        why_subtitle:
+          lang === "vi" ? info.vi_why_subtitle : info.en_why_subtitle,
         why_choose_items: (info.why_choose_items || []).map((item) => ({
           icon_name: item.icon_name,
           title: lang === "vi" ? item.vi_title : item.en_title,
@@ -175,11 +176,14 @@ export const createGeneralInformation = async (req, res) => {
     const logoImageData = req.body?.logo_image;
     const personalImagesData = req.body?.personal_image;
 
-    const logoImage = logoImageData?.url && logoImageData?.public_id
-      ? { url: logoImageData.url, public_id: logoImageData.public_id }
-      : null;
+    const logoImage =
+      logoImageData?.url && logoImageData?.public_id
+        ? { url: logoImageData.url, public_id: logoImageData.public_id }
+        : null;
 
-    const personalImages = Array.isArray(personalImagesData) ? personalImagesData : [];
+    const personalImages = Array.isArray(personalImagesData)
+      ? personalImagesData
+      : [];
 
     const info = await GeneralInfomation.create({
       vi_team_name,
@@ -299,7 +303,8 @@ export const updateGeneralInformation = async (req, res) => {
 
     // JSON array fields (body is already parsed JSON, no JSON.parse needed)
     if (req.body?.stats !== undefined) updateData.stats = req.body.stats;
-    if (req.body?.why_choose_items !== undefined) updateData.why_choose_items = req.body.why_choose_items;
+    if (req.body?.why_choose_items !== undefined)
+      updateData.why_choose_items = req.body.why_choose_items;
 
     // about_moments: images already embedded as {url, public_id}; delete replaced ones
     if (req.body?.about_moments !== undefined) {
@@ -308,7 +313,11 @@ export const updateGeneralInformation = async (req, res) => {
       for (let i = 0; i < newMoments.length; i++) {
         const newImg = newMoments[i]?.img;
         const oldImg = oldMoments[i]?.img;
-        if (newImg?.public_id && oldImg?.public_id && newImg.public_id !== oldImg.public_id) {
+        if (
+          newImg?.public_id &&
+          oldImg?.public_id &&
+          newImg.public_id !== oldImg.public_id
+        ) {
           await deleteFromCloudinary(oldImg.public_id);
         }
       }
@@ -333,13 +342,17 @@ export const updateGeneralInformation = async (req, res) => {
       if (currentInfo.logo_image?.public_id) {
         await deleteFromCloudinary(currentInfo.logo_image.public_id);
       }
-      updateData.logo_image = { url: logoImageData.url, public_id: logoImageData.public_id };
+      updateData.logo_image = {
+        url: logoImageData.url,
+        public_id: logoImageData.public_id,
+      };
     }
 
     // personal_image: new pre-uploaded images to append
     const newPersonalImages = req.body?.personal_image;
     if (Array.isArray(newPersonalImages) && newPersonalImages.length > 0) {
-      const existing = updateData.personal_image ?? (currentInfo.personal_image || []);
+      const existing =
+        updateData.personal_image ?? (currentInfo.personal_image || []);
       updateData.personal_image = [...existing, ...newPersonalImages];
     }
 
@@ -358,7 +371,8 @@ export const updateGeneralInformation = async (req, res) => {
     // collage_images: new pre-uploaded images to append
     const newCollageImages = req.body?.collage_images;
     if (Array.isArray(newCollageImages) && newCollageImages.length > 0) {
-      const existing = updateData.collage_images ?? (currentInfo.collage_images || []);
+      const existing =
+        updateData.collage_images ?? (currentInfo.collage_images || []);
       updateData.collage_images = [...existing, ...newCollageImages];
     }
 
@@ -368,7 +382,10 @@ export const updateGeneralInformation = async (req, res) => {
       if (currentInfo.about_hero_image?.public_id) {
         await deleteFromCloudinary(currentInfo.about_hero_image.public_id);
       }
-      updateData.about_hero_image = { url: aboutHeroImageData.url, public_id: aboutHeroImageData.public_id };
+      updateData.about_hero_image = {
+        url: aboutHeroImageData.url,
+        public_id: aboutHeroImageData.public_id,
+      };
     }
 
     updateData.updatedAt = new Date();
