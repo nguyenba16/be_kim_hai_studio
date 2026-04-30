@@ -104,11 +104,15 @@ export const signin = async (req, res) => {
     console.log("auth ==>", username, password);
     const user = await User.findOne({ username, role: "admin" });
     if (!user) {
-      return res.status(401).json({ message: "Invalid username or password" });
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid username or password" });
     }
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(401).json({ message: "Invalid username or password" });
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid username or password" });
     }
 
     const accessToken = jwt.sign(
