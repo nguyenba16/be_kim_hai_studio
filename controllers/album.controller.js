@@ -386,22 +386,25 @@ export const deleteAlbum = async (req, res) => {
         message: "albumIds must be a non-empty array",
       });
     }
-    const images = await Image.find({
-      albumId: { $in: albumIds },
-    });
-    await Promise.allSettled(
-      images.map((img) =>
-        img?.public_id
-          ? deleteFromCloudinary(img.public_id)
+    const [images, albums] = await Promise.all([
+      Image.find({ albumId: { $in: albumIds } }),
+      Album.find({ _id: { $in: albumIds } }),
+    ]);
+
+    // Xóa file ảnh trong album + ảnh bìa khỏi storage
+    await Promise.allSettled([
+      ...images.map((img) =>
+        img?.public_id ? deleteFromCloudinary(img.public_id) : Promise.resolve(),
+      ),
+      ...albums.map((album) =>
+        album.cover_image?.public_id
+          ? deleteFromCloudinary(album.cover_image.public_id)
           : Promise.resolve(),
       ),
-    );
-    await Image.deleteMany({
-      albumId: { $in: albumIds },
-    });
-    const result = await Album.deleteMany({
-      _id: { $in: albumIds },
-    });
+    ]);
+
+    await Image.deleteMany({ albumId: { $in: albumIds } });
+    const result = await Album.deleteMany({ _id: { $in: albumIds } });
 
     return res.status(200).json({
       success: true,

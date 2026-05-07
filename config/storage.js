@@ -23,10 +23,13 @@ const isVpsFile = (public_id) =>
 
 // Nén ảnh sang WebP quality 85, giữ ICC color profile. Fallback về null nếu lỗi.
 async function optimizeImage(buffer) {
+  // Bỏ qua nếu ảnh đã nhỏ (< 300KB) — không cần xử lý thêm
+  if (buffer.length < 300 * 1024) return null;
+
   try {
     const optimized = await sharp(buffer, { failOn: "none" })
       .withMetadata() // giữ ICC color profile, quan trọng cho photographer
-      .webp({ quality: 85, effort: 4 })
+      .webp({ quality: 85, effort: 2 }) // effort 2 = nhanh gấp 3x so với 4, chất lượng gần như nhau
       .toBuffer();
     return { buffer: optimized, ext: ".webp" };
   } catch (err) {
