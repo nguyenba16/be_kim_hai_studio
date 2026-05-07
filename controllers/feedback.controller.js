@@ -1,8 +1,8 @@
 import Feedback from "../models/feedback.model.js";
 import {
-  uploadToCloudinary,
-  deleteFromCloudinary,
-} from "../config/cloudinary.js";
+  uploadToStorage as uploadToCloudinary,
+  deleteFromStorage as deleteFromCloudinary,
+} from "../config/storage.js";
 
 export const createFeedback = async (req, res) => {
   try {
@@ -19,13 +19,13 @@ export const createFeedback = async (req, res) => {
 
     const avatarFile = req.files?.avatar?.[0];
     if (avatarFile) {
-      const result = await uploadToCloudinary(avatarFile.buffer, "feedbacks/avatars");
+      const result = await uploadToCloudinary(avatarFile.buffer, "feedbacks/avatars", avatarFile.originalname);
       avatar = { url: result.secure_url, public_id: result.public_id };
     }
 
     const proofFile = req.files?.proof_image?.[0];
     if (proofFile) {
-      const result = await uploadToCloudinary(proofFile.buffer, "feedbacks/proofs");
+      const result = await uploadToCloudinary(proofFile.buffer, "feedbacks/proofs", proofFile.originalname);
       proof_image = { url: result.secure_url, public_id: result.public_id };
     }
 
@@ -69,7 +69,7 @@ export const updateFeedback = async (req, res) => {
     if (avatarFile) {
       if (feedback.avatar?.public_id)
         await deleteFromCloudinary(feedback.avatar.public_id);
-      const result = await uploadToCloudinary(avatarFile.buffer, "feedbacks/avatars");
+      const result = await uploadToCloudinary(avatarFile.buffer, "feedbacks/avatars", avatarFile.originalname);
       feedback.avatar = { url: result.secure_url, public_id: result.public_id };
     }
 
@@ -77,7 +77,7 @@ export const updateFeedback = async (req, res) => {
     if (proofFile) {
       if (feedback.proof_image?.public_id)
         await deleteFromCloudinary(feedback.proof_image.public_id);
-      const result = await uploadToCloudinary(proofFile.buffer, "feedbacks/proofs");
+      const result = await uploadToCloudinary(proofFile.buffer, "feedbacks/proofs", proofFile.originalname);
       feedback.proof_image = { url: result.secure_url, public_id: result.public_id };
     }
 

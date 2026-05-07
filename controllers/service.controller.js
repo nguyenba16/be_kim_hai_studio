@@ -1,8 +1,8 @@
 import Service from "../models/service.model.js";
 import {
-  uploadToCloudinary,
-  deleteFromCloudinary,
-} from "../config/cloudinary.js";
+  uploadToStorage as uploadToCloudinary,
+  deleteFromStorage as deleteFromCloudinary,
+} from "../config/storage.js";
 import slugify from "slugify";
 
 export const createService = async (req, res) => {
@@ -23,6 +23,7 @@ export const createService = async (req, res) => {
       const result = await uploadToCloudinary(
         coverFile.buffer,
         "images/service-cover",
+        coverFile.originalname,
       );
 
       cover_image = {
@@ -40,6 +41,7 @@ export const createService = async (req, res) => {
               const result = await uploadToCloudinary(
                 file.buffer,
                 "images/service",
+                file.originalname,
               );
 
               return {
@@ -199,6 +201,7 @@ export const updateService = async (req, res) => {
       const result = await uploadToCloudinary(
         coverFile.buffer,
         "images/service-cover",
+        coverFile.originalname,
       );
 
       service.cover_image = {
@@ -231,6 +234,7 @@ export const updateService = async (req, res) => {
           const result = await uploadToCloudinary(
             file.buffer,
             "images/service",
+            file.originalname,
           );
 
           return {

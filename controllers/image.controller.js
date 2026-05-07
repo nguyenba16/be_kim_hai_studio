@@ -1,8 +1,8 @@
 import Image from "../models/image.model.js";
 import {
-  uploadToCloudinary,
-  deleteFromCloudinary,
-} from "../config/cloudinary.js";
+  uploadToStorage as uploadToCloudinary,
+  deleteFromStorage as deleteFromCloudinary,
+} from "../config/storage.js";
 
 export const createImages = async (req, res) => {
   try {
@@ -29,7 +29,7 @@ export const createImages = async (req, res) => {
     const createdImages = [];
 
     for (const file of imageFiles) {
-      const result = await uploadToCloudinary(file.buffer, "images/gallery");
+      const result = await uploadToCloudinary(file.buffer, "images/gallery", file.originalname);
 
       const image = await Image.create({
         vi_title,
@@ -176,6 +176,7 @@ export const updateImage = async (req, res) => {
       const result = await uploadToCloudinary(
         req.files.image[0].buffer,
         "images/gallery",
+        req.files.image[0].originalname,
       );
 
       if (image.public_id) {

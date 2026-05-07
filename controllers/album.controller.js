@@ -1,8 +1,8 @@
 import Album from "../models/album.model.js";
 import {
-  uploadToCloudinary,
-  deleteFromCloudinary,
-} from "../config/cloudinary.js";
+  uploadToStorage as uploadToCloudinary,
+  deleteFromStorage as deleteFromCloudinary,
+} from "../config/storage.js";
 import Image from "../models/image.model.js";
 export const createAlbum = async (req, res) => {
   try {
@@ -30,6 +30,7 @@ export const createAlbum = async (req, res) => {
       const result = await uploadToCloudinary(
         coverFile.buffer,
         "images/album-cover",
+        coverFile.originalname,
       );
       cover_image = { url: result.secure_url, public_id: result.public_id };
     } else if (req.body.cover_image?.url) {
@@ -53,7 +54,7 @@ export const createAlbum = async (req, res) => {
     if (files.length > 0) {
       await Promise.all(
         files.map(async (file) => {
-          const result = await uploadToCloudinary(file.buffer, "images/gallery");
+          const result = await uploadToCloudinary(file.buffer, "images/gallery", file.originalname);
           await Image.create({
             albumId: album._id,
             url: result.secure_url,
@@ -295,7 +296,7 @@ export const updateAlbum = async (req, res) => {
       if (album.cover_image?.public_id) {
         await deleteFromCloudinary(album.cover_image.public_id);
       }
-      const result = await uploadToCloudinary(coverFile.buffer, "images/album-cover");
+      const result = await uploadToCloudinary(coverFile.buffer, "images/album-cover", coverFile.originalname);
       album.cover_image = { url: result.secure_url, public_id: result.public_id };
     } else if (req.body.cover_image?.url) {
       if (album.cover_image?.public_id) {
@@ -332,7 +333,7 @@ export const updateAlbum = async (req, res) => {
     if (files.length > 0) {
       await Promise.all(
         files.map(async (file) => {
-          const result = await uploadToCloudinary(file.buffer, "images/gallery");
+          const result = await uploadToCloudinary(file.buffer, "images/gallery", file.originalname);
           await Image.create({
             albumId: album._id,
             url: result.secure_url,

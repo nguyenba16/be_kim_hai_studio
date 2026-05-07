@@ -1,5 +1,5 @@
 import PageSection from "../models/pageSection.model.js";
-import { deleteFromCloudinary } from "../config/cloudinary.js";
+import { deleteFromStorage as deleteFromCloudinary } from "../config/storage.js";
 
 // ========== CUSTOMER ==========
 

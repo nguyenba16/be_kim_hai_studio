@@ -18,6 +18,7 @@ import feedbackRouterCustomer from "./routes/customer/feedback.router.js";
 import pageSectionRouterAdmin from "./routes/admin/pageSection.router.js";
 import pageSectionRouterCustomer from "./routes/customer/pageSection.router.js";
 import cloudinaryRouterAdmin from "./routes/admin/cloudinary.router.js";
+import uploadRouterAdmin from "./routes/admin/upload.router.js";
 
 import connectDB from "./config/db.js";
 const app = express();
@@ -63,6 +64,7 @@ app.use("/admin/feedback", feedbackRouterAdmin);
 app.use("/admin/page-section", pageSectionRouterAdmin);
 app.use("/customer/page-section", pageSectionRouterCustomer);
 app.use("/admin/cloudinary", cloudinaryRouterAdmin);
+app.use("/admin/upload", uploadRouterAdmin);
 
 // app.post("/customer/upload", upload.single("file"), async (req, res) => {
 //   try {

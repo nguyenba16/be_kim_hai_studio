@@ -1,5 +1,5 @@
 import GeneralInfomation from "../models/generalInfomation.model.js";
-import { deleteFromCloudinary } from "../config/cloudinary.js";
+import { deleteFromStorage as deleteFromCloudinary } from "../config/storage.js";
 export const getGeneralInformation = async (req, res) => {
   try {
     const { lang } = req.query;

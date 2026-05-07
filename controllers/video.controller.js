@@ -1,8 +1,8 @@
 import Video from "../models/video.model.js";
 import {
-  uploadToCloudinary,
-  deleteFromCloudinary,
-} from "../config/cloudinary.js";
+  uploadToStorage as uploadToCloudinary,
+  deleteFromStorage as deleteFromCloudinary,
+} from "../config/storage.js";
 export const createVideo = async (req, res) => {
   try {
     const {
@@ -31,6 +31,7 @@ export const createVideo = async (req, res) => {
       const result = await uploadToCloudinary(
         coverFile.buffer,
         "videos/video-cover",
+        coverFile.originalname,
       );
       cover_image = {
         url: result.secure_url,
@@ -114,6 +115,7 @@ export const updateVideo = async (req, res) => {
       const result = await uploadToCloudinary(
         coverFile.buffer,
         "videos/video-cover",
+        coverFile.originalname,
       );
       video.cover_image = {
         url: result.secure_url,

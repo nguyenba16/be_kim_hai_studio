@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { deleteFromCloudinary } from "../config/cloudinary.js";
+import { deleteFromStorage as deleteFromCloudinary } from "../config/storage.js";
 
 export const getUploadSignature = (req, res) => {
   try {
