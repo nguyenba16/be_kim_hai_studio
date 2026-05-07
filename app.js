@@ -1,6 +1,9 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import path from "path";
+import { fileURLToPath } from "url";
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 import authRouter from "./routes/admin/auth.router.js";
 import generalInfomationRouterCustomer from "./routes/customer/generalInfomation.router.js";
 import authRouterCustomer from "./routes/customer/auth.router.js";
@@ -42,6 +45,13 @@ app.use(
 app.use(cookieParser());
 
 app.use(express.json());
+
+// Serve uploads statically khi chạy local (production dùng nginx)
+if (process.env.UPLOAD_DIR) {
+  const uploadDir = path.resolve(__dirname, process.env.UPLOAD_DIR);
+  app.use("/uploads_kim_hai", express.static(uploadDir));
+}
+
 app.get("/", (req, res) => res.send("Hello fen!"));
 
 // CUSTOMER API HERE
